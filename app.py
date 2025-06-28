@@ -97,10 +97,11 @@ class CottonDiseaseAI:
         try:
             if groq_api_key:
                 self.groq_client = Groq(api_key=groq_api_key)
-                st.session_state['groq_configured'] = True  # Add this line
+                st.session_state['groq_configured'] = True
             if cohere_api_key:
-                self.cohere_client = cohere.Client(cohere_api_key)
-                st.session_state['cohere_configured'] = True  # Add this line
+                # Fixed: Updated Cohere client initialization
+                self.cohere_client = cohere.Client(api_key=cohere_api_key)
+                st.session_state['cohere_configured'] = True
             return True
         except Exception as e:
             st.error(f"Error setting up APIs: {e}")
