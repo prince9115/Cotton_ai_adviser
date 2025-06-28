@@ -7,7 +7,3 @@ plotly
 protobuf
 groq>=0.4.0
 cohere>=4.0.0
-base64
-io
-json
-os
