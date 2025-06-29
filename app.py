@@ -21,7 +21,7 @@ st.set_page_config(
 
 # Disease information database
 DISEASE_INFO = {
-    "Bacterial Blight": {
+    "Bacterial Blight of Cotton": {
         "description": "Bacterial infection causing water-soaked lesions",
         "severity": "High",
         "symptoms": "Angular lesions, yellow halos, leaf drop",
@@ -71,10 +71,14 @@ class CottonDiseaseAI:
         self.groq_client = None
         self.cohere_client = None
         self.class_names = [
-            "Bacterial Blight", "Curl Virus", "Healthy Leaf",
-            "Herbicide Growth Damage", "Leaf Hopper Jassids",
-            "Leaf Redding", "Leaf Variegation"
-        ]
+    "Bacterial Blight of Cotton", 
+    "Curl Virus", 
+    "Healthy Leaf",
+    "Herbicide Growth Damage", 
+    "Leaf Hopper Jassids",
+    "Leaf Redding", 
+    "Leaf Variegation"
+]
         # Load pre-installed model
         self.model = self.load_model()
     
