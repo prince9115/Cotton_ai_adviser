@@ -86,7 +86,7 @@ def f1_metric(y_true, y_pred):
     return 2*((precision*recall)/(precision+recall+1e-7))
 
 class CottonDiseaseAI:
-    def _init_(self):
+    def __init__(self):
         self.model = None
         self.groq_client = None
         self.cohere_client = None
@@ -397,8 +397,8 @@ def main():
             
             # Main prediction display
             st.subheader(f"Detected Disease: {disease}")
-            st.write(f"*Confidence:* {confidence:.1%}")
-            st.write(f"*Severity:* {DISEASE_INFO.get(disease, {}).get('severity', 'Unknown')}")
+            st.write(f"**Confidence:** {confidence:.1%}")
+            st.write(f"**Severity:** {DISEASE_INFO.get(disease, {}).get('severity', 'Unknown')}")
             
             # Confidence visualization
             fig = px.bar(
@@ -414,9 +414,9 @@ def main():
             disease_info = DISEASE_INFO.get(disease, {})
             if disease_info:
                 st.subheader("Disease Information")
-                st.write(f"*Description:* {disease_info.get('description', 'N/A')}")
-                st.write(f"*Common Symptoms:* {disease_info.get('symptoms', 'N/A')}")
-                st.write(f"*Typical Causes:* {disease_info.get('causes', 'N/A')}")
+                st.write(f"**Description:** {disease_info.get('description', 'N/A')}")
+                st.write(f"**Common Symptoms:** {disease_info.get('symptoms', 'N/A')}")
+                st.write(f"**Typical Causes:** {disease_info.get('causes', 'N/A')}")
     
     # AI Analysis Section
     if 'prediction_results' in st.session_state:
@@ -477,7 +477,7 @@ def main():
         else:
             st.success("Your cotton plant appears healthy! Continue with current care practices.")
             if 'maintenance' in treatments:
-                st.write("*Maintenance Recommendations:*")
+                st.write("**Maintenance Recommendations:**")
                 for rec in treatments['maintenance']:
                     st.write(f"• {rec}")
     
@@ -495,5 +495,5 @@ def main():
         unsafe_allow_html=True
     )
 
-if _name_ == "_main_":
-    main()
+if __name__ == "__main__":
+    main()
