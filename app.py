@@ -21,7 +21,7 @@ st.set_page_config(
 
 # Disease information database
 DISEASE_INFO = {
-    "Bacterial Blight of Cotton": {
+    "Bacterial Blight": {
         "description": "Bacterial infection causing water-soaked lesions",
         "severity": "High",
         "symptoms": "Angular lesions, yellow halos, leaf drop",
@@ -65,32 +65,55 @@ DISEASE_INFO = {
     }
 }
 
+# Custom metric functions for model loading
+def precision_metric(y_true, y_pred):
+    import tensorflow.keras.backend as K
+    true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
+    predicted_positives = K.sum(K.round(K.clip(y_pred, 0, 1)))
+    precision = true_positives / (predicted_positives + K.epsilon())
+    return precision
+
+def recall_metric(y_true, y_pred):
+    import tensorflow.keras.backend as K
+    true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
+    possible_positives = K.sum(K.round(K.clip(y_true, 0, 1)))
+    recall = true_positives / (possible_positives + K.epsilon())
+    return recall
+
+def f1_metric(y_true, y_pred):
+    precision = precision_metric(y_true, y_pred)
+    recall = recall_metric(y_true, y_pred)
+    return 2*((precision*recall)/(precision+recall+1e-7))
+
 class CottonDiseaseAI:
-    def __init__(self):
+    def _init_(self):
         self.model = None
         self.groq_client = None
         self.cohere_client = None
         self.class_names = [
-    "Bacterial Blight of Cotton", 
-    "Curl Virus", 
-    "Healthy Leaf",
-    "Herbicide Growth Damage", 
-    "Leaf Hopper Jassids",
-    "Leaf Redding", 
-    "Leaf Variegation"
-]
+            "Bacterial Blight", "Curl Virus", "Healthy Leaf",
+            "Herbicide Growth Damage", "Leaf Hopper Jassids",
+            "Leaf Redding", "Leaf Variegation"
+        ]
         # Load pre-installed model
         self.model = self.load_model()
     
     @st.cache_resource
     def load_model(_self):
         """Load the pre-installed cotton disease model"""
+        # Updated model filename to match your saved model
         model_path = "cotton_leaf_cnn_best_model.keras"
         if not os.path.exists(model_path):
             st.error(f"Model file not found: {model_path}")
             return None
         try:
-            model = tf.keras.models.load_model(model_path)
+            # Load model with custom metrics
+            custom_objects = {
+                'precision_metric': precision_metric,
+                'recall_metric': recall_metric,
+                'f1_metric': f1_metric
+            }
+            model = tf.keras.models.load_model(model_path, custom_objects=custom_objects)
             return model
         except Exception as e:
             st.error(f"Error loading model: {e}")
@@ -114,8 +137,8 @@ class CottonDiseaseAI:
     def preprocess_image(self, image):
         """Preprocess image for model prediction"""
         try:
-            # Resize to model input size
-            image = image.resize((144, 144))
+            # FIXED: Resize to correct model input size (224x224)
+            image = image.resize((224, 224))
             # Convert to RGB if needed
             if image.mode != 'RGB':
                 image = image.convert('RGB')
@@ -312,7 +335,8 @@ def main():
         st.subheader("About")
         st.info("""
         This AI system analyzes cotton leaf diseases using:
-        - CNN model for image classification
+        - Enhanced CNN model with ResNet architecture
+        - Attention mechanisms for better accuracy
         - Groq for intelligent analysis
         - Cohere for semantic understanding
         """)
@@ -326,7 +350,7 @@ def main():
         uploaded_image = st.file_uploader(
             "Choose an image...",
             type=['jpg', 'jpeg', 'png', 'bmp'],
-            help="Upload a clear image of cotton leaf for disease detection"
+            help="Upload a clear image of cotton leaf for disease detection (will be resized to 224x224)"
         )
         
         if uploaded_image:
@@ -373,8 +397,8 @@ def main():
             
             # Main prediction display
             st.subheader(f"Detected Disease: {disease}")
-            st.write(f"**Confidence:** {confidence:.1%}")
-            st.write(f"**Severity:** {DISEASE_INFO.get(disease, {}).get('severity', 'Unknown')}")
+            st.write(f"*Confidence:* {confidence:.1%}")
+            st.write(f"*Severity:* {DISEASE_INFO.get(disease, {}).get('severity', 'Unknown')}")
             
             # Confidence visualization
             fig = px.bar(
@@ -390,9 +414,9 @@ def main():
             disease_info = DISEASE_INFO.get(disease, {})
             if disease_info:
                 st.subheader("Disease Information")
-                st.write(f"**Description:** {disease_info.get('description', 'N/A')}")
-                st.write(f"**Common Symptoms:** {disease_info.get('symptoms', 'N/A')}")
-                st.write(f"**Typical Causes:** {disease_info.get('causes', 'N/A')}")
+                st.write(f"*Description:* {disease_info.get('description', 'N/A')}")
+                st.write(f"*Common Symptoms:* {disease_info.get('symptoms', 'N/A')}")
+                st.write(f"*Typical Causes:* {disease_info.get('causes', 'N/A')}")
     
     # AI Analysis Section
     if 'prediction_results' in st.session_state:
@@ -453,7 +477,7 @@ def main():
         else:
             st.success("Your cotton plant appears healthy! Continue with current care practices.")
             if 'maintenance' in treatments:
-                st.write("**Maintenance Recommendations:**")
+                st.write("*Maintenance Recommendations:*")
                 for rec in treatments['maintenance']:
                     st.write(f"• {rec}")
     
@@ -471,5 +495,5 @@ def main():
         unsafe_allow_html=True
     )
 
-if __name__ == "__main__":
-    main()
+if _name_ == "_main_":
+    main()
