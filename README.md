@@ -210,7 +210,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Authors
 
-- **Prince Patel** - *Developer* - [GitHub](https://github.com/prince9115)
+- **Prince Patel** - *Lead Developer* - [GitHub](https://github.com/prince9115)
 
 ## Acknowledgments
 
